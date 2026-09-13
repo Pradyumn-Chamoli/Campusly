@@ -1,0 +1,215 @@
+// Campusly — Prisma schema
+// Core MVP entities only. See docs/02_SRS.md §5 and docs/06_Phase0_Decisions.md.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ---------- Enums ----------
+
+enum UserRole {
+  STUDENT
+  ADMIN
+}
+
+enum ListingCategory {
+  BOOKS
+  ELECTRONICS
+  FURNITURE
+  CLOTHING
+  STATIONERY
+  SPORTS
+  OTHER
+}
+
+enum ListingCondition {
+  NEW
+  LIKE_NEW
+  GOOD
+  FAIR
+  POOR
+}
+
+enum ListingStatus {
+  ACTIVE
+  SOLD
+  REMOVED
+}
+
+enum RequestStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+  CANCELLED
+  COMPLETED
+}
+
+enum ReportStatus {
+  PENDING
+  DISMISSED
+  REMOVED
+}
+
+enum ReportReason {
+  SPAM
+  INAPPROPRIATE
+  PROHIBITED
+  MISLEADING
+  OTHER
+}
+
+// ---------- Models ----------
+
+model User {
+  id           Int      @id @default(autoincrement())
+  email        String   @unique
+  passwordHash String
+  name         String
+  role         UserRole @default(STUDENT)
+  bio          String?
+  avatarUrl    String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  listings        Listing[]
+  favorites       Favorite[]
+  conversations   Conversation[] @relation("ConversationBuyer")
+  sellerChats     Conversation[] @relation("ConversationSeller")
+  sentMessages    Message[]      @relation("MessageSender")
+  requests        Request[]      @relation("RequestBuyer")
+  sellerRequests  Request[]      @relation("RequestSeller")
+  reports         Report[]       @relation("ReportReporter")
+  resolvedReports Report[]       @relation("ReportResolver")
+
+  @@map("users")
+}
+
+model Listing {
+  id          Int              @id @default(autoincrement())
+  title       String
+  description String
+  price       Decimal          @db.Decimal(10, 2)
+  category    ListingCategory
+  condition   ListingCondition
+  status      ListingStatus    @default(ACTIVE)
+  sellerId    Int
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  seller        User           @relation(fields: [sellerId], references: [id])
+  images        ListingImage[]
+  favorites     Favorite[]
+  conversations Conversation[]
+  requests      Request[]
+  reports       Report[]
+
+  @@index([sellerId])
+  @@index([status])
+  @@index([category])
+  @@map("listings")
+}
+
+model ListingImage {
+  id                 Int      @id @default(autoincrement())
+  listingId          Int
+  cloudinaryPublicId String
+  url                String
+  altText            String?
+  position           Int      @default(0)
+  createdAt          DateTime @default(now())
+
+  listing Listing @relation(fields: [listingId], references: [id], onDelete: Cascade)
+
+  @@index([listingId])
+  @@map("listing_images")
+}
+
+model Favorite {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  listingId Int
+  createdAt DateTime @default(now())
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  listing Listing @relation(fields: [listingId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, listingId])
+  @@map("favorites")
+}
+
+model Conversation {
+  id        Int      @id @default(autoincrement())
+  listingId Int
+  buyerId   Int
+  sellerId  Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  listing  Listing   @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  buyer    User      @relation("ConversationBuyer", fields: [buyerId], references: [id])
+  seller   User      @relation("ConversationSeller", fields: [sellerId], references: [id])
+  messages Message[]
+
+  @@unique([listingId, buyerId])
+  @@index([sellerId])
+  @@map("conversations")
+}
+
+model Message {
+  id             Int      @id @default(autoincrement())
+  conversationId Int
+  senderId       Int
+  body           String
+  createdAt      DateTime @default(now())
+
+  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  sender       User         @relation("MessageSender", fields: [senderId], references: [id])
+
+  @@index([conversationId])
+  @@map("messages")
+}
+
+model Request {
+  id        Int           @id @default(autoincrement())
+  listingId Int
+  buyerId   Int
+  sellerId  Int
+  status    RequestStatus @default(PENDING)
+  note      String?
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+
+  listing Listing @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  buyer   User    @relation("RequestBuyer", fields: [buyerId], references: [id])
+  seller  User    @relation("RequestSeller", fields: [sellerId], references: [id])
+
+  @@index([buyerId])
+  @@index([sellerId])
+  @@index([status])
+  @@map("requests")
+}
+
+model Report {
+  id           Int          @id @default(autoincrement())
+  listingId    Int
+  reporterId   Int
+  reason       ReportReason
+  description  String?
+  status       ReportStatus @default(PENDING)
+  resolvedById Int?
+  resolvedAt   DateTime?
+  createdAt    DateTime     @default(now())
+
+  listing    Listing @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  reporter   User    @relation("ReportReporter", fields: [reporterId], references: [id])
+  resolvedBy User?   @relation("ReportResolver", fields: [resolvedById], references: [id])
+
+  @@index([status])
+  @@index([reporterId])
+  @@map("reports")
+}
