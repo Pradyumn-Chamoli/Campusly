@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useNavigate, useLocation } from "react-router-dom";
+import { Link, Navigate, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { Button } from "../components/ui/Button";
 import Logo from "../components/Logo";
@@ -23,7 +23,7 @@ function EyeOffIcon() {
 }
 
 export default function LoginPage() {
-  const { login } = useAuth();
+  const { user, loading: authLoading, login } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -36,6 +36,11 @@ export default function LoginPage() {
 
   const from = location.state?.from?.pathname || "/";
   const successMessage = location.state?.message;
+
+  // An authenticated user has no reason to be on the login screen.
+  if (!authLoading && user) {
+    return <Navigate to={from} replace />;
+  }
 
   function validate() {
     const errs = {};

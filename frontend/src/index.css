@@ -85,3 +85,25 @@
     font: inherit;
   }
 }
+
+@keyframes campusly-menu-in {
+  from {
+    opacity: 0;
+    transform: translateY(-6px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.menu-in {
+  animation: campusly-menu-in 140ms ease-out;
+  transform-origin: top right;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .menu-in {
+    animation: none;
+  }
+}

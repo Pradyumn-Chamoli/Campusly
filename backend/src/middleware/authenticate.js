@@ -1,8 +1,6 @@
 import jwt from "jsonwebtoken";
 import config from "../config/index.js";
-import { PrismaClient } from "@prisma/client";
-
-const prisma = new PrismaClient();
+import prisma from "../config/prisma.js";
 
 export default async function authenticate(req, res, next) {
   const header = req.headers.authorization;

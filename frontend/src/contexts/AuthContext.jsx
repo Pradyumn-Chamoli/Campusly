@@ -42,6 +42,15 @@ function useInitialAuth() {
     await api.post("/auth/register", { email, password, name });
   }, []);
 
+  // Keeps the signed-in user in sync after a profile update so the header,
+  // avatar and profile page all reflect the new details immediately.
+  const updateProfile = useCallback(async (payload) => {
+    const res = await api.put("/users/profile", payload);
+    const userData = res.data.data;
+    setUser(userData);
+    return userData;
+  }, []);
+
   const logout = useCallback(async () => {
     try {
       await api.post("/auth/logout");
@@ -53,7 +62,7 @@ function useInitialAuth() {
     }
   }, []);
 
-  return { user, loading, login, register, logout };
+  return { user, loading, login, register, updateProfile, logout };
 }
 
 export function AuthProvider({ children }) {

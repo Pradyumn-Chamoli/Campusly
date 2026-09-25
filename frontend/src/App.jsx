@@ -5,6 +5,8 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import HomePage from "./pages/HomePage";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
+import ProfilePage from "./pages/ProfilePage";
+import PublicProfilePage from "./pages/PublicProfilePage";
 
 export default function App() {
   return (
@@ -15,6 +17,7 @@ export default function App() {
             <Route path="/" element={<HomePage />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
+            <Route path="/users/:id" element={<PublicProfilePage />} />
             <Route
               path="/favorites"
               element={
@@ -43,8 +46,17 @@ export default function App() {
               path="/profile"
               element={
                 <ProtectedRoute>
-                  <PlaceholderPage title="Profile" />
+                  <ProfilePage />
                 </ProtectedRoute>
+              }
+            />
+            <Route
+              path="*"
+              element={
+                <PlaceholderPage
+                  title="Page not found"
+                  description="The page you are looking for does not exist or has moved."
+                />
               }
             />
           </Routes>
@@ -54,13 +66,11 @@ export default function App() {
   );
 }
 
-function PlaceholderPage({ title }) {
+function PlaceholderPage({ title, description = "Coming in a future phase." }) {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 text-center">
       <h1 className="text-2xl font-bold text-text">{title}</h1>
-      <p className="text-text-secondary mt-2">
-        Coming in a future phase.
-      </p>
+      <p className="text-text-secondary mt-2">{description}</p>
     </div>
   );
 }

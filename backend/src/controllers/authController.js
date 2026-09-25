@@ -1,9 +1,7 @@
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import { PrismaClient } from "@prisma/client";
 import config from "../config/index.js";
-
-const prisma = new PrismaClient();
+import prisma from "../config/prisma.js";
 
 const SALT_ROUNDS = 10;
 const JWT_EXPIRES_IN = "7d";
@@ -80,6 +78,9 @@ export async function login(req, res, next) {
   }
 }
 
+// Campusly uses stateless JWT authentication, so there is no server-side
+// session record to destroy. Invalidation happens on the client: the stored
+// token is discarded, and the token is no longer sent with any request.
 export async function logout(req, res) {
   return res.status(200).json({ message: "Logged out" });
 }

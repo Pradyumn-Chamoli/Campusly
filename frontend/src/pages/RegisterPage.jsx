@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, Navigate, useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { Button } from "../components/ui/Button";
 import Logo from "../components/Logo";
@@ -23,7 +23,7 @@ function EyeOffIcon() {
 }
 
 export default function RegisterPage() {
-  const { register } = useAuth();
+  const { user, loading: authLoading, register } = useAuth();
   const navigate = useNavigate();
 
   const [name, setName] = useState("");
@@ -34,6 +34,11 @@ export default function RegisterPage() {
   const [errors, setErrors] = useState({});
   const [serverError, setServerError] = useState("");
   const [loading, setLoading] = useState(false);
+
+  // An authenticated user has no reason to be on the registration screen.
+  if (!authLoading && user) {
+    return <Navigate to="/" replace />;
+  }
 
   function validate() {
     const errs = {};

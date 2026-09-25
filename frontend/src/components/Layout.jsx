@@ -2,6 +2,13 @@ import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { Button } from "./ui/Button";
+import {
+  DropdownMenu,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+} from "./ui/DropdownMenu";
+import Avatar from "./ui/Avatar";
 import Logo from "./Logo";
 
 function HeartIcon() {
@@ -16,6 +23,25 @@ function ChatIcon() {
   return (
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
       <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+    </svg>
+  );
+}
+
+function UserIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+      <circle cx="12" cy="7" r="4" />
+    </svg>
+  );
+}
+
+function LogOutIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+      <polyline points="16 17 21 12 16 7" />
+      <line x1="21" y1="12" x2="9" y2="12" />
     </svg>
   );
 }
@@ -118,11 +144,51 @@ export default function Layout({ children }) {
                       Sell
                     </Button>
                   </Link>
-                  <Link to="/profile" className="ml-1">
-                    <div className="w-8 h-8 rounded-full bg-campus-green flex items-center justify-center text-white text-sm font-semibold hover:ring-2 hover:ring-campus-green/20 transition-all">
-                      {user.name.charAt(0).toUpperCase()}
-                    </div>
-                  </Link>
+                  <DropdownMenu
+                    trigger={
+                      <button
+                        className="ml-1 rounded-full focus:outline-none focus-visible:ring-2 focus-visible:ring-campus-green/30 transition-all hover:ring-2 hover:ring-campus-green/20"
+                        aria-label="Account menu"
+                      >
+                        <Avatar user={user} size="sm" />
+                      </button>
+                    }
+                  >
+                    <DropdownMenuLabel>
+                      <p className="text-sm font-semibold text-text truncate">
+                        {user.name}
+                      </p>
+                      <p className="text-xs text-text-muted font-normal truncate">
+                        {user.email}
+                      </p>
+                    </DropdownMenuLabel>
+                    <DropdownMenuItem
+                      icon={<UserIcon />}
+                      onClick={() => navigate("/profile")}
+                    >
+                      My profile
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      icon={<HeartIcon />}
+                      onClick={() => navigate("/favorites")}
+                    >
+                      Favorites
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      icon={<ChatIcon />}
+                      onClick={() => navigate("/messages")}
+                    >
+                      Messages
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem
+                      icon={<LogOutIcon />}
+                      danger
+                      onClick={handleLogout}
+                    >
+                      Log out
+                    </DropdownMenuItem>
+                  </DropdownMenu>
                 </>
               ) : (
                 <>
@@ -165,6 +231,17 @@ export default function Layout({ children }) {
               ))}
               {user ? (
                 <>
+                  <div className="flex items-center gap-3 px-3 py-3 mb-2 rounded-xl bg-bg border border-border">
+                    <Avatar user={user} size="sm" />
+                    <div className="min-w-0">
+                      <p className="text-sm font-semibold text-text truncate">
+                        {user.name}
+                      </p>
+                      <p className="text-xs text-text-muted truncate">
+                        {user.email}
+                      </p>
+                    </div>
+                  </div>
                   <Link
                     to="/profile"
                     onClick={() => setMobileOpen(false)}
@@ -180,7 +257,7 @@ export default function Layout({ children }) {
                     onClick={handleLogout}
                     className="block w-full text-left px-3 py-2.5 rounded-lg text-sm font-medium text-error hover:bg-error-light transition-colors"
                   >
-                    Logout
+                    Log out
                   </button>
                 </>
               ) : (
