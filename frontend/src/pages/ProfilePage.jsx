@@ -9,7 +9,7 @@ import Avatar from "../components/ui/Avatar";
 import Alert from "../components/ui/Alert";
 import Spinner from "../components/ui/Spinner";
 import EmptyState from "../components/ui/EmptyState";
-import ListingCard from "../components/ListingCard";
+import ListingGrid from "../components/ListingGrid";
 import { formatMonthYear, STATUS_LABELS } from "../lib/format";
 
 const STATUS_FILTERS = ["ALL", "ACTIVE", "SOLD", "REMOVED"];
@@ -313,11 +313,7 @@ export default function ProfilePage() {
             }
           />
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {listings.map((listing) => (
-              <ListingCard key={listing.id} listing={listing} />
-            ))}
-          </div>
+          <ListingGrid listings={listings} />
         )}
       </section>
     </div>

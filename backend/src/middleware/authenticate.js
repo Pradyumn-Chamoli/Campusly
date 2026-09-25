@@ -2,12 +2,9 @@ import jwt from "jsonwebtoken";
 import config from "../config/index.js";
 import prisma from "../config/prisma.js";
 
-export default async function authenticate(req, res, next) {
+async function resolveUser(req) {
   const header = req.headers.authorization;
-
-  if (!header || !header.startsWith("Bearer ")) {
-    return res.status(401).json({ error: "Not authenticated" });
-  }
+  if (!header || !header.startsWith("Bearer ")) return false;
 
   const token = header.split(" ")[1];
 
@@ -27,13 +24,29 @@ export default async function authenticate(req, res, next) {
       },
     });
 
-    if (!user) {
-      return res.status(401).json({ error: "Not authenticated" });
-    }
+    if (!user) return false;
 
     req.user = user;
-    next();
+    return true;
   } catch {
+    return false;
+  }
+}
+
+export default async function authenticate(req, res, next) {
+  const resolved = await resolveUser(req);
+
+  if (!resolved) {
     return res.status(401).json({ error: "Not authenticated" });
   }
+
+  next();
+}
+
+// Attaches `req.user` when a valid token is present, but never fails the
+// request. Used where guests may view extra detail (e.g. admins seeing
+// removed listings).
+export async function optionalAuthenticate(req, res, next) {
+  await resolveUser(req);
+  next();
 }

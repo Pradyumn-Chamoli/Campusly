@@ -35,12 +35,13 @@ export function Button({
   size,
   children,
   loading,
+  disabled,
   ...props
 }) {
   return (
     <button
       className={cn(buttonVariants({ variant, size, className }))}
-      disabled={loading || props.disabled}
+      disabled={loading || disabled}
       {...props}
     >
       {loading && (

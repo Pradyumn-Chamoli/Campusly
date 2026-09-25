@@ -7,7 +7,7 @@ import Avatar from "../components/ui/Avatar";
 import Alert from "../components/ui/Alert";
 import Spinner from "../components/ui/Spinner";
 import EmptyState from "../components/ui/EmptyState";
-import ListingCard from "../components/ListingCard";
+import ListingGrid from "../components/ListingGrid";
 import { formatMonthYear } from "../lib/format";
 
 // Keying on the id remounts the view per seller, so each seller starts from a
@@ -175,18 +175,14 @@ function ProfileView({ userId }) {
                   <Button>List an item</Button>
                 </Link>
               ) : (
-                <Link to="/">
+                <Link to="/marketplace">
                   <Button variant="secondary">Browse marketplace</Button>
                 </Link>
               )
             }
           />
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {listings.map((listing) => (
-              <ListingCard key={listing.id} listing={listing} />
-            ))}
-          </div>
+          <ListingGrid listings={listings} />
         )}
       </section>
     </div>

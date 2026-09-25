@@ -9,8 +9,9 @@ import {
 } from "../lib/format";
 import Avatar from "./ui/Avatar";
 
-// `to` is optional: listing details arrive in Phase 6, so a card without it
-// renders as a static tile instead of a link.
+// A card is either a link to the listing details page or a static tile. When
+// the card itself links somewhere, the seller is plain text — nesting a link
+// inside a link is invalid HTML.
 export default function ListingCard({ listing, to, showSeller = false, className }) {
   const image = listing.images?.[0];
 
@@ -62,15 +63,24 @@ export default function ListingCard({ listing, to, showSeller = false, className
 
         <div className="flex items-center justify-between gap-2 mt-3">
           {showSeller && listing.seller ? (
-            <Link
-              to={`/users/${listing.seller.id}`}
-              className="flex items-center gap-2 min-w-0 hover:underline"
-            >
-              <Avatar user={listing.seller} size="xs" />
-              <span className="text-xs font-medium text-text truncate">
-                {listing.seller.name}
+            to ? (
+              <span className="flex items-center gap-2 min-w-0">
+                <Avatar user={listing.seller} size="xs" />
+                <span className="text-xs font-medium text-text truncate">
+                  {listing.seller.name}
+                </span>
               </span>
-            </Link>
+            ) : (
+              <Link
+                to={`/users/${listing.seller.id}`}
+                className="flex items-center gap-2 min-w-0 hover:underline"
+              >
+                <Avatar user={listing.seller} size="xs" />
+                <span className="text-xs font-medium text-text truncate">
+                  {listing.seller.name}
+                </span>
+              </Link>
+            )
           ) : (
             <span className="text-xs text-text-muted">
               {listing._count?.favorites ?? 0}{" "}

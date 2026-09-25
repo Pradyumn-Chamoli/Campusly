@@ -85,13 +85,13 @@ export default function Layout({ children }) {
   const isActive = (path) => location.pathname === path;
 
   const publicLinks = [
-    { to: "/", label: "Marketplace" },
-    { to: "/categories", label: "Categories" },
+    { to: "/marketplace", label: "Marketplace" },
+    { to: "/", label: "Categories" },
   ];
 
   const authLinks = [
-    { to: "/", label: "Marketplace" },
-    { to: "/categories", label: "Categories" },
+    { to: "/marketplace", label: "Marketplace" },
+    { to: "/", label: "Categories" },
     { to: "/favorites", label: "Favorites" },
     { to: "/messages", label: "Messages" },
     { to: "/listings/new", label: "Sell" },
