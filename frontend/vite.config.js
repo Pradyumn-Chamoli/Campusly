@@ -15,6 +15,13 @@ export default defineConfig({
         target: "http://localhost:5000",
         changeOrigin: true,
       },
+      // Socket.IO needs its own proxy so chat connects to the same origin
+      // as the REST API in development.
+      "/socket.io": {
+        target: "http://localhost:5000",
+        changeOrigin: true,
+        ws: true,
+      },
     },
   },
 });

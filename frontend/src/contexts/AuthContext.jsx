@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect, useCallback } from "react";
 import api from "../services/api";
+import { ensureSocket, teardownSocket } from "../services/socket";
 
 const AuthContext = createContext(null);
 
@@ -13,7 +14,11 @@ function useInitialAuth() {
     api
       .get("/auth/me")
       .then((res) => {
-        if (!cancelled) setUser(res.data.data);
+        if (!cancelled) {
+          setUser(res.data.data);
+          // Real-time chat is only available to signed-in users.
+          ensureSocket();
+        }
       })
       .catch(() => {
         if (!cancelled) {
@@ -35,6 +40,7 @@ function useInitialAuth() {
     const { token, user: userData } = res.data.data;
     localStorage.setItem("token", token);
     setUser(userData);
+    ensureSocket();
     return userData;
   }, []);
 
@@ -58,6 +64,7 @@ function useInitialAuth() {
       // Ignore errors on logout
     } finally {
       localStorage.removeItem("token");
+      teardownSocket();
       setUser(null);
     }
   }, []);

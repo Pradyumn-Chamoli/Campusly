@@ -13,6 +13,7 @@ import FavoritesPage from "./pages/FavoritesPage";
 import ListingDetailsPage from "./pages/ListingDetailsPage";
 import CreateListingPage from "./pages/CreateListingPage";
 import EditListingPage from "./pages/EditListingPage";
+import MessagesPage from "./pages/MessagesPage";
 
 export default function App() {
   return (
@@ -34,7 +35,12 @@ export default function App() {
               } />
             <Route path="/messages" element={
               <ProtectedRoute>
-                <PlaceholderPage title="Messages" />
+                <MessagesPage />
+              </ProtectedRoute>
+            } />
+            <Route path="/messages/:conversationId" element={
+              <ProtectedRoute>
+                <MessagesPage />
               </ProtectedRoute>
             } />
             <Route path="/listings/new" element={

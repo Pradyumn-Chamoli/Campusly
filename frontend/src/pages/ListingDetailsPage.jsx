@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import api from "../services/api";
 import { useAuth } from "../contexts/AuthContext";
 import { Button } from "../components/ui/Button";
@@ -22,6 +22,7 @@ export default function ListingDetailsPage() {
   const { id } = useParams();
   const { user } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
 
   // `requestId` tells us which `id` this response belongs to, so a changed
   // param reads as "still loading" without an extra state write in the effect.
@@ -34,6 +35,7 @@ export default function ListingDetailsPage() {
   const [notice, setNotice] = useState("");
   const [selected, setSelected] = useState(0);
   const [busy, setBusy] = useState(false);
+  const [contacting, setContacting] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
 
   // The API count is accurate when the listing loads; each save/unsaved
@@ -121,6 +123,28 @@ export default function ListingDetailsPage() {
       setBusy(false);
       setConfirmDelete(false);
       setActionError(err.response?.data?.error || "Could not delete this listing.");
+    }
+  }
+
+  // Opens the conversation about this listing, creating it if it is new, and
+  // lands the seller/buyer in the chat with it.
+  async function handleContact() {
+    if (!user) {
+      navigate("/login", { state: { from: location } });
+      return;
+    }
+
+    setContacting(true);
+    setNotice("");
+    setActionError("");
+    try {
+      const res = await api.post("/conversations", { listingId: listing.id });
+      navigate(`/messages/${res.data.data.id}`);
+    } catch (err) {
+      setContacting(false);
+      setActionError(
+        err.response?.data?.error || "Could not start a conversation."
+      );
     }
   }
 
@@ -326,8 +350,9 @@ export default function ListingDetailsPage() {
                 <>
                   <Button
                     className="w-full"
-                    disabled
-                    title="Messaging arrives in a later phase"
+                    onClick={handleContact}
+                    loading={contacting}
+                    disabled={listing.status !== "ACTIVE"}
                   >
                     Contact seller
                   </Button>

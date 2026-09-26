@@ -19,6 +19,11 @@ const monthYearFormatter = new Intl.DateTimeFormat("en-IN", {
   year: "numeric",
 });
 
+const timeFormatter = new Intl.DateTimeFormat("en-IN", {
+  hour: "2-digit",
+  minute: "2-digit",
+});
+
 export function formatPrice(value) {
   const amount = Number(value);
   if (!Number.isFinite(amount)) return "—";
@@ -35,6 +40,12 @@ export function formatMonthYear(value) {
   if (!value) return "";
   const date = new Date(value);
   return Number.isNaN(date.getTime()) ? "" : monthYearFormatter.format(date);
+}
+
+export function formatTime(value) {
+  if (!value) return "";
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? "" : timeFormatter.format(date);
 }
 
 export const CONDITION_LABELS = {
