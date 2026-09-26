@@ -1,7 +1,8 @@
 import { useState } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { Button } from "./ui/Button";
+import SearchBar from "./SearchBar";
 import {
   DropdownMenu,
   DropdownMenuItem,
@@ -74,12 +75,30 @@ export default function Layout({ children }) {
   const { user, logout } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [mobileOpen, setMobileOpen] = useState(false);
 
   const handleLogout = async () => {
     await logout();
     navigate("/");
     setMobileOpen(false);
+  };
+
+  // The header search always targets the marketplace. On the marketplace page
+  // it edits the `search` param in place so other filters are preserved.
+  const onMarketplace = location.pathname === "/marketplace";
+  const headerSearch = onMarketplace ? searchParams.get("search") ?? "" : "";
+
+  const handleSearch = (term) => {
+    setMobileOpen(false);
+    if (onMarketplace) {
+      const next = new URLSearchParams(searchParams);
+      if (term) next.set("search", term);
+      else next.delete("search");
+      if (next.toString() !== searchParams.toString()) setSearchParams(next);
+      return;
+    }
+    navigate(term ? `/marketplace?search=${encodeURIComponent(term)}` : "/marketplace");
   };
 
   const isActive = (path) => location.pathname === path;
@@ -127,6 +146,15 @@ export default function Layout({ children }) {
                   </Link>
                 ))}
               </nav>
+            </div>
+
+            <div className="hidden md:block flex-1 max-w-[16rem] px-4 lg:px-6">
+              <SearchBar
+                id="header-search"
+                placeholder="Search marketplace"
+                value={headerSearch}
+                onSubmit={handleSearch}
+              />
             </div>
 
             <div className="hidden md:flex items-center gap-2">
@@ -215,6 +243,13 @@ export default function Layout({ children }) {
         {mobileOpen && (
           <div className="md:hidden border-t border-border bg-surface">
             <div className="px-4 py-3 space-y-1">
+              <SearchBar
+                id="mobile-header-search"
+                className="mb-2"
+                placeholder="Search marketplace"
+                value={headerSearch}
+                onSubmit={handleSearch}
+              />
               {navLinks.map((link) => (
                 <Link
                   key={link.to}

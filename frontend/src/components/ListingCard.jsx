@@ -8,11 +8,18 @@ import {
   formatPrice,
 } from "../lib/format";
 import Avatar from "./ui/Avatar";
+import FavoriteButton from "./FavoriteButton";
 
 // A card is either a link to the listing details page or a static tile. When
 // the card itself links somewhere, the seller is plain text — nesting a link
 // inside a link is invalid HTML.
-export default function ListingCard({ listing, to, showSeller = false, className }) {
+export default function ListingCard({
+  listing,
+  to,
+  showSeller = false,
+  className,
+  onFavoriteChange,
+}) {
   const image = listing.images?.[0];
 
   const body = (
@@ -97,22 +104,40 @@ export default function ListingCard({ listing, to, showSeller = false, className
   );
 
   const shell =
-    "block bg-surface border border-border rounded-2xl overflow-hidden transition-all";
+    "block h-full bg-surface border border-border rounded-2xl overflow-hidden transition-all";
+
+  // The favorite control is a sibling of the card link, not a child: nesting
+  // a button inside the link would be invalid HTML and unreachable by
+  // keyboard users.
+  const favoriteButton = (
+    <FavoriteButton
+      listingId={listing.id}
+      className="absolute right-3 top-3 z-10"
+      onChange={onFavoriteChange}
+    />
+  );
 
   if (to) {
     return (
-      <Link
-        to={to}
-        className={cn(
-          shell,
-          "hover:shadow-lg hover:border-campus-green/30 hover:-translate-y-0.5",
-          className
-        )}
-      >
-        {body}
-      </Link>
+      <div className={cn("relative group", className)}>
+        <Link
+          to={to}
+          className={cn(
+            shell,
+            "hover:shadow-lg hover:border-campus-green/30 hover:-translate-y-0.5"
+          )}
+        >
+          {body}
+        </Link>
+        {favoriteButton}
+      </div>
     );
   }
 
-  return <article className={cn(shell, className)}>{body}</article>;
+  return (
+    <article className={cn(shell, "relative", className)}>
+      {body}
+      {favoriteButton}
+    </article>
+  );
 }

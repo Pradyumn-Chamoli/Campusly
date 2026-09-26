@@ -1,47 +1,15 @@
 import prisma from "../config/prisma.js";
 import { removeImage } from "../config/storage.js";
 import { clamp, toFloat, toInt } from "../utils/params.js";
-
-const DEFAULT_PAGE = 1;
-const DEFAULT_LIMIT = 20;
-const MAX_LIMIT = 100;
-
-const LISTING_SELECT = {
-  id: true,
-  title: true,
-  price: true,
-  category: true,
-  condition: true,
-  status: true,
-  createdAt: true,
-  seller: {
-    select: { id: true, name: true, avatarUrl: true },
-  },
-  images: {
-    select: { id: true, url: true, altText: true, position: true },
-    orderBy: { position: "asc" },
-  },
-  _count: {
-    select: { favorites: true },
-  },
-};
-
-// Prisma returns Decimal for money; the API contract uses a plain number.
-function serializeListing(listing) {
-  return {
-    ...listing,
-    price: Number(listing.price),
-  };
-}
-
-function buildPagination(page, limit, total) {
-  return {
-    page,
-    limit,
-    total,
-    totalPages: Math.max(1, Math.ceil(total / limit)),
-  };
-}
+import {
+  DEFAULT_LIMIT,
+  DEFAULT_PAGE,
+  LISTING_DETAIL_SELECT,
+  LISTING_SELECT,
+  MAX_LIMIT,
+  buildPagination,
+  serializeListing,
+} from "../utils/listingShape.js";
 
 export async function getListings(req, res, next) {
   try {
@@ -123,13 +91,6 @@ export async function getMyListings(req, res, next) {
     next(error);
   }
 }
-
-const LISTING_DETAIL_SELECT = {
-  ...LISTING_SELECT,
-  description: true,
-  sellerId: true,
-  updatedAt: true,
-};
 
 export async function getListing(req, res, next) {
   try {

@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import api from "../services/api";
 import { useAuth } from "../contexts/AuthContext";
 import { Button } from "../components/ui/Button";
 import ListingGrid, { ListingGridSkeleton } from "../components/ListingGrid";
+import SearchBar from "../components/SearchBar";
 import { CATEGORY_EMOJI, CATEGORY_LABELS } from "../lib/format";
 
 function ArrowRightIcon() {
@@ -26,8 +27,13 @@ const FEATURES = [
 
 export default function HomePage() {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [listings, setListings] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  const goToSearch = (term) => {
+    navigate(term ? `/marketplace?search=${encodeURIComponent(term)}` : "/marketplace");
+  };
 
   useEffect(() => {
     let cancelled = false;
@@ -86,6 +92,19 @@ export default function HomePage() {
                 </Button>
               </Link>
             )}
+          </div>
+
+          <div className="max-w-lg mx-auto mb-8">
+            <SearchBar
+              id="hero-search"
+              placeholder="Search textbooks, gadgets, furniture..."
+              submitLabel="Search"
+              submitClassName="bg-white text-campus-green hover:bg-white/90"
+              onSubmit={goToSearch}
+            />
+            <p className="mt-2 text-xs text-white/60 text-center">
+              Try “calculator”, “desk chair” or “lab coat”
+            </p>
           </div>
 
           <div className="flex flex-wrap items-center justify-center gap-2">

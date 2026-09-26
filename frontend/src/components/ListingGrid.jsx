@@ -8,6 +8,7 @@ export default function ListingGrid({
   to,
   showSeller = false,
   className,
+  onFavoriteChange,
 }) {
   return (
     <div
@@ -21,6 +22,7 @@ export default function ListingGrid({
           listing={listing}
           to={to ?? `/listings/${listing.id}`}
           showSeller={showSeller}
+          onFavoriteChange={onFavoriteChange}
         />
       ))}
     </div>

@@ -7,6 +7,7 @@ import Alert from "../components/ui/Alert";
 import Spinner from "../components/ui/Spinner";
 import Avatar from "../components/ui/Avatar";
 import Dialog from "../components/ui/Dialog";
+import FavoriteButton from "../components/FavoriteButton";
 import {
   CATEGORY_EMOJI,
   CATEGORY_LABELS,
@@ -34,6 +35,16 @@ export default function ListingDetailsPage() {
   const [selected, setSelected] = useState(0);
   const [busy, setBusy] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
+
+  // The API count is accurate when the listing loads; each save/unsaved
+  // during this visit is tracked so the number stays truthful without a
+  // refetch. Reset when navigating to another listing.
+  const [saveDelta, setSaveDelta] = useState(0);
+  const [prevId, setPrevId] = useState(id);
+  if (prevId !== id) {
+    setPrevId(id);
+    setSaveDelta(0);
+  }
 
   useEffect(() => {
     let cancelled = false;
@@ -245,6 +256,29 @@ export default function ListingDetailsPage() {
           <div className="bg-surface border border-border rounded-2xl p-5 sm:p-6 shadow-card">
             <p className="text-3xl font-bold text-text">{formatPrice(listing.price)}</p>
             <h1 className="text-xl font-bold text-text mt-1">{listing.title}</h1>
+
+            <div className="mt-3 flex items-center justify-between gap-3">
+              <p className="text-xs text-text-muted">
+                {Math.max(0, (listing._count?.favorites ?? 0) + saveDelta)}{" "}
+                {Math.max(0, (listing._count?.favorites ?? 0) + saveDelta) === 1
+                  ? "save"
+                  : "saves"}
+              </p>
+              <FavoriteButton
+                variant="pill"
+                listingId={listing.id}
+                onChange={(_listingId, favorited) => {
+                  setSaveDelta((delta) => delta + (favorited ? 1 : -1));
+                  setActionError("");
+                  setNotice(
+                    favorited
+                      ? "Saved to your favorites."
+                      : "Removed from your favorites."
+                  );
+                }}
+                onError={setActionError}
+              />
+            </div>
 
             <dl className="mt-4 pt-4 border-t border-border space-y-2 text-sm">
               <div className="flex justify-between gap-4">

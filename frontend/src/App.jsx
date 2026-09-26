@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./contexts/AuthContext";
+import { FavoritesProvider } from "./contexts/FavoritesContext";
 import Layout from "./components/Layout";
 import ProtectedRoute from "./components/ProtectedRoute";
 import HomePage from "./pages/HomePage";
@@ -8,6 +9,7 @@ import RegisterPage from "./pages/RegisterPage";
 import ProfilePage from "./pages/ProfilePage";
 import PublicProfilePage from "./pages/PublicProfilePage";
 import MarketplacePage from "./pages/MarketplacePage";
+import FavoritesPage from "./pages/FavoritesPage";
 import ListingDetailsPage from "./pages/ListingDetailsPage";
 import CreateListingPage from "./pages/CreateListingPage";
 import EditListingPage from "./pages/EditListingPage";
@@ -16,19 +18,20 @@ export default function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
-        <Layout>
-          <Routes>
-            <Route path="/" element={<HomePage />} />
-            <Route path="/marketplace" element={<MarketplacePage />} />
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/register" element={<RegisterPage />} />
-            <Route path="/users/:id" element={<PublicProfilePage />} />
-            <Route path="/listings/:id" element={<ListingDetailsPage />} />
-            <Route path="/favorites" element={
-              <ProtectedRoute>
-                <PlaceholderPage title="Favorites" />
-              </ProtectedRoute>
-            } />
+        <FavoritesProvider>
+          <Layout>
+            <Routes>
+              <Route path="/" element={<HomePage />} />
+              <Route path="/marketplace" element={<MarketplacePage />} />
+              <Route path="/login" element={<LoginPage />} />
+              <Route path="/register" element={<RegisterPage />} />
+              <Route path="/users/:id" element={<PublicProfilePage />} />
+              <Route path="/listings/:id" element={<ListingDetailsPage />} />
+              <Route path="/favorites" element={
+                <ProtectedRoute>
+                  <FavoritesPage />
+                </ProtectedRoute>
+              } />
             <Route path="/messages" element={
               <ProtectedRoute>
                 <PlaceholderPage title="Messages" />
@@ -55,8 +58,9 @@ export default function App() {
                 description="The page you are looking for does not exist or has moved."
               />
             } />
-          </Routes>
-        </Layout>
+            </Routes>
+          </Layout>
+        </FavoritesProvider>
       </AuthProvider>
     </BrowserRouter>
   );
