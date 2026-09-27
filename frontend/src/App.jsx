@@ -14,6 +14,7 @@ import ListingDetailsPage from "./pages/ListingDetailsPage";
 import CreateListingPage from "./pages/CreateListingPage";
 import EditListingPage from "./pages/EditListingPage";
 import MessagesPage from "./pages/MessagesPage";
+import RequestsPage from "./pages/RequestsPage";
 
 export default function App() {
   return (
@@ -41,6 +42,11 @@ export default function App() {
             <Route path="/messages/:conversationId" element={
               <ProtectedRoute>
                 <MessagesPage />
+              </ProtectedRoute>
+            } />
+            <Route path="/requests" element={
+              <ProtectedRoute>
+                <RequestsPage />
               </ProtectedRoute>
             } />
             <Route path="/listings/new" element={

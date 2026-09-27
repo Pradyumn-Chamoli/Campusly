@@ -7,6 +7,7 @@ import Alert from "../components/ui/Alert";
 import Spinner from "../components/ui/Spinner";
 import Avatar from "../components/ui/Avatar";
 import Dialog from "../components/ui/Dialog";
+import Textarea from "../components/ui/Textarea";
 import FavoriteButton from "../components/FavoriteButton";
 import {
   CATEGORY_EMOJI,
@@ -37,6 +38,12 @@ export default function ListingDetailsPage() {
   const [busy, setBusy] = useState(false);
   const [contacting, setContacting] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
+
+  // Request-to-buy dialog state.
+  const [requestOpen, setRequestOpen] = useState(false);
+  const [requestNote, setRequestNote] = useState("");
+  const [requesting, setRequesting] = useState(false);
+  const [requestError, setRequestError] = useState("");
 
   // The API count is accurate when the listing loads; each save/unsaved
   // during this visit is tracked so the number stays truthful without a
@@ -145,6 +152,37 @@ export default function ListingDetailsPage() {
       setActionError(
         err.response?.data?.error || "Could not start a conversation."
       );
+    }
+  }
+
+  // Opens the request dialog, routing guests to login first so the request is
+  // submitted under their own account.
+  function openRequestDialog() {
+    if (!user) {
+      navigate("/login", { state: { from: location } });
+      return;
+    }
+    setRequestNote("");
+    setRequestError("");
+    setRequestOpen(true);
+  }
+
+  async function handleRequestSubmit() {
+    setRequesting(true);
+    setRequestError("");
+    try {
+      await api.post("/requests", {
+        listingId: listing.id,
+        ...(requestNote.trim() && { note: requestNote.trim() }),
+      });
+      setRequestOpen(false);
+      setNotice(
+        "Request sent. The seller can accept or reject it from their requests page."
+      );
+    } catch (err) {
+      setRequestError(err.response?.data?.error || "Could not send this request.");
+    } finally {
+      setRequesting(false);
     }
   }
 
@@ -350,6 +388,14 @@ export default function ListingDetailsPage() {
                 <>
                   <Button
                     className="w-full"
+                    onClick={openRequestDialog}
+                    disabled={listing.status !== "ACTIVE"}
+                  >
+                    Request to buy
+                  </Button>
+                  <Button
+                    variant="secondary"
+                    className="w-full"
                     onClick={handleContact}
                     loading={contacting}
                     disabled={listing.status !== "ACTIVE"}
@@ -392,6 +438,47 @@ export default function ListingDetailsPage() {
           </div>
         </div>
       </div>
+
+      <Dialog
+        open={requestOpen}
+        onClose={() => setRequestOpen(false)}
+        title="Request to buy"
+        description={`Send ${listing.seller.name} a request for "${listing.title}". They can accept or reject it.`}
+        footer={
+          <>
+            <Button
+              variant="ghost"
+              onClick={() => setRequestOpen(false)}
+              disabled={requesting}
+            >
+              Cancel
+            </Button>
+            <Button onClick={handleRequestSubmit} loading={requesting}>
+              Send request
+            </Button>
+          </>
+        }
+      >
+        <form
+          onSubmit={(event) => {
+            event.preventDefault();
+            handleRequestSubmit();
+          }}
+        >
+          <Textarea
+            label="Note"
+            hint={`${requestNote.length}/500`}
+            placeholder="When can you pick it up? Any questions for the seller?"
+            rows={4}
+            maxLength={500}
+            value={requestNote}
+            onChange={(event) => setRequestNote(event.target.value)}
+            error={requestError || undefined}
+            disabled={requesting}
+            data-autofocus
+          />
+        </form>
+      </Dialog>
 
       <Dialog
         open={confirmDelete}

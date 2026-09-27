@@ -4,6 +4,7 @@ import userRoutes from "./users.js";
 import listingRoutes from "./listings.js";
 import favoriteRoutes from "./favorites.js";
 import conversationRoutes from "./conversations.js";
+import requestRoutes from "./requests.js";
 
 const router = Router();
 
@@ -16,5 +17,6 @@ router.use("/users", userRoutes);
 router.use("/listings", listingRoutes);
 router.use("/favorites", favoriteRoutes);
 router.use("/conversations", conversationRoutes);
+router.use("/requests", requestRoutes);
 
 export default router;

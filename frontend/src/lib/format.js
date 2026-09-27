@@ -81,3 +81,11 @@ export const STATUS_LABELS = {
   SOLD: "Sold",
   REMOVED: "Removed",
 };
+
+export const REQUEST_STATUS_LABELS = {
+  PENDING: "Pending",
+  ACCEPTED: "Accepted",
+  REJECTED: "Rejected",
+  CANCELLED: "Cancelled",
+  COMPLETED: "Completed",
+};

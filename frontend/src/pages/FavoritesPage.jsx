@@ -16,6 +16,7 @@ export default function FavoritesPage() {
   const [attempt, setAttempt] = useState(0);
   const [loadingMore, setLoadingMore] = useState(false);
   const [moreError, setMoreError] = useState("");
+  const [notice, setNotice] = useState("");
 
   useEffect(() => {
     let cancelled = false;
@@ -84,18 +85,22 @@ export default function FavoritesPage() {
   // The heart on the card already called the API; here we only drop the row
   // from the list so the grid matches the new state.
   const handleFavoriteChange = useCallback((listingId, favorited) => {
-    if (favorited) return;
-    setResponse((prev) =>
-      prev
-        ? {
-            ...prev,
-            favorites: prev.favorites.filter(
-              (favorite) => favorite.listing.id !== listingId
-            ),
-            total: Math.max(0, prev.total - 1),
-          }
-        : prev
+    setNotice(
+      favorited ? "Saved to your favorites." : "Removed from your favorites."
     );
+    if (!favorited) {
+      setResponse((prev) =>
+        prev
+          ? {
+              ...prev,
+              favorites: prev.favorites.filter(
+                (favorite) => favorite.listing.id !== listingId
+              ),
+              total: Math.max(0, prev.total - 1),
+            }
+          : prev
+      );
+    }
   }, []);
 
   const loading = !response || response.attempt !== attempt;

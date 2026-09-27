@@ -28,6 +28,18 @@ function ChatIcon() {
   );
 }
 
+function HandshakeIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <path d="m11 17 2 2a1 1 0 1 0 3-3" />
+      <path d="m14 14 2.5 2.5a1 1 0 1 0 3-3l-3.88-3.88a3 3 0 0 0-4.24 0l-.88.88a1 1 0 1 1-3-3l2.81-2.81a5.79 5.79 0 0 1 7.06-.87l.47.28a2 2 0 0 0 1.42.25L21 4" />
+      <path d="m21 3 1 11h-2" />
+      <path d="M3 3 2 14l6.5 6.5a1 1 0 1 0 3-3" />
+      <path d="M3 4h8" />
+    </svg>
+  );
+}
+
 function UserIcon() {
   return (
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
@@ -113,6 +125,7 @@ export default function Layout({ children }) {
     { to: "/", label: "Categories" },
     { to: "/favorites", label: "Favorites" },
     { to: "/messages", label: "Messages" },
+    { to: "/requests", label: "Requests" },
     { to: "/listings/new", label: "Sell" },
   ];
 
@@ -166,6 +179,9 @@ export default function Layout({ children }) {
                   <Link to="/messages" className="p-2 rounded-full hover:bg-surface-hover transition-colors text-text-secondary hover:text-text">
                     <ChatIcon />
                   </Link>
+                  <Link to="/messages" className="p-2 rounded-full hover:bg-surface-hover transition-colors text-text-secondary hover:text-text" aria-label="Requests">
+                    <HandshakeIcon />
+                  </Link>
                   <Link to="/listings/new">
                     <Button size="sm" className="rounded-full gap-1.5">
                       <PlusIcon />
@@ -207,6 +223,12 @@ export default function Layout({ children }) {
                       onClick={() => navigate("/messages")}
                     >
                       Messages
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      icon={<HandshakeIcon />}
+                      onClick={() => navigate("/requests")}
+                    >
+                      Requests
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem
