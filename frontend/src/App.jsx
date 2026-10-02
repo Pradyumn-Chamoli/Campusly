@@ -15,6 +15,7 @@ import CreateListingPage from "./pages/CreateListingPage";
 import EditListingPage from "./pages/EditListingPage";
 import MessagesPage from "./pages/MessagesPage";
 import RequestsPage from "./pages/RequestsPage";
+import AdminPage from "./pages/AdminPage";
 
 export default function App() {
   return (
@@ -62,6 +63,11 @@ export default function App() {
             <Route path="/profile" element={
               <ProtectedRoute>
                 <ProfilePage />
+              </ProtectedRoute>
+            } />
+            <Route path="/admin" element={
+              <ProtectedRoute role="ADMIN">
+                <AdminPage />
               </ProtectedRoute>
             } />
             <Route path="*" element={

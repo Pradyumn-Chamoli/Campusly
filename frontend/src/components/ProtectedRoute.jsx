@@ -1,8 +1,13 @@
-import { Navigate, useLocation } from "react-router-dom";
+import { Link, Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import Spinner from "./ui/Spinner";
+import EmptyState from "./ui/EmptyState";
+import { Button } from "./ui/Button";
 
-export default function ProtectedRoute({ children }) {
+// Pass `role` to restrict a route to one user role (e.g. role="ADMIN").
+// The backend enforces authorization regardless — this only shapes what
+// the UI shows before a request is made.
+export default function ProtectedRoute({ children, role }) {
   const { user, loading } = useAuth();
   const location = useLocation();
 
@@ -19,6 +24,23 @@ export default function ProtectedRoute({ children }) {
 
   if (!user) {
     return <Navigate to="/login" state={{ from: location }} replace />;
+  }
+
+  if (role && user.role !== role) {
+    return (
+      <div className="max-w-xl mx-auto px-4 sm:px-6 py-16">
+        <EmptyState
+          icon="🔒"
+          title="You don't have access to this page"
+          description="This area is restricted to administrators."
+          action={
+            <Link to="/">
+              <Button variant="secondary">Back to home</Button>
+            </Link>
+          }
+        />
+      </div>
+    );
   }
 
   return children;

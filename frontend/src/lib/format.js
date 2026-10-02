@@ -89,3 +89,17 @@ export const REQUEST_STATUS_LABELS = {
   CANCELLED: "Cancelled",
   COMPLETED: "Completed",
 };
+
+export const REPORT_REASON_LABELS = {
+  SPAM: "Spam",
+  INAPPROPRIATE: "Inappropriate content",
+  PROHIBITED: "Prohibited item",
+  MISLEADING: "Misleading listing",
+  OTHER: "Something else",
+};
+
+export const REPORT_STATUS_LABELS = {
+  PENDING: "Pending",
+  DISMISSED: "Dismissed",
+  REMOVED: "Listing removed",
+};

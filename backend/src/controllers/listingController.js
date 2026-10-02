@@ -92,6 +92,35 @@ export async function getMyListings(req, res, next) {
   }
 }
 
+// Admin-only view of listings hidden by moderation. Same payload shape as
+// the marketplace list, filtered to REMOVED status (docs/07_API_Design.md §12).
+export async function getRemovedListings(req, res, next) {
+  try {
+    const page = toInt(req.query.page, DEFAULT_PAGE);
+    const limit = clamp(toInt(req.query.limit, DEFAULT_LIMIT), 1, MAX_LIMIT);
+
+    const where = { status: "REMOVED" };
+
+    const [listings, total] = await Promise.all([
+      prisma.listing.findMany({
+        where,
+        select: LISTING_SELECT,
+        orderBy: { updatedAt: "desc" },
+        skip: (page - 1) * limit,
+        take: limit,
+      }),
+      prisma.listing.count({ where }),
+    ]);
+
+    return res.status(200).json({
+      data: listings.map(serializeListing),
+      pagination: buildPagination(page, limit, total),
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
 export async function getListing(req, res, next) {
   try {
     const listingId = toInt(req.params.id);

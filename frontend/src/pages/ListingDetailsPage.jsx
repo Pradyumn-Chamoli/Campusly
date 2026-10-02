@@ -9,6 +9,7 @@ import Avatar from "../components/ui/Avatar";
 import Dialog from "../components/ui/Dialog";
 import Textarea from "../components/ui/Textarea";
 import FavoriteButton from "../components/FavoriteButton";
+import ReportDialog from "../components/ReportDialog";
 import {
   CATEGORY_EMOJI,
   CATEGORY_LABELS,
@@ -44,6 +45,9 @@ export default function ListingDetailsPage() {
   const [requestNote, setRequestNote] = useState("");
   const [requesting, setRequesting] = useState(false);
   const [requestError, setRequestError] = useState("");
+
+  // Report dialog state.
+  const [reportOpen, setReportOpen] = useState(false);
 
   // The API count is accurate when the listing loads; each save/unsaved
   // during this visit is tracked so the number stays truthful without a
@@ -407,6 +411,19 @@ export default function ListingDetailsPage() {
                       ? "This item has already been sold."
                       : "Meet on campus to complete the exchange."}
                   </p>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (!user) {
+                        navigate("/login", { state: { from: location } });
+                        return;
+                      }
+                      setReportOpen(true);
+                    }}
+                    className="mx-auto block text-xs font-medium text-text-muted hover:text-error transition-colors cursor-pointer"
+                  >
+                    Report listing
+                  </button>
                 </>
               )}
             </div>
@@ -479,6 +496,17 @@ export default function ListingDetailsPage() {
           />
         </form>
       </Dialog>
+
+      <ReportDialog
+        open={reportOpen}
+        onClose={() => setReportOpen(false)}
+        listing={listing}
+        onReported={() =>
+          setNotice(
+            "Report submitted. Our team will review this listing shortly."
+          )
+        }
+      />
 
       <Dialog
         open={confirmDelete}

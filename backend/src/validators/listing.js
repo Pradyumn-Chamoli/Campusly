@@ -18,7 +18,7 @@ export const LISTING_CONDITIONS = ["NEW", "LIKE_NEW", "GOOD", "FAIR", "POOR"];
 
 export const LISTING_STATUSES = ["ACTIVE", "SOLD", "REMOVED"];
 
-const paginationValidation = [
+export const paginationValidation = [
   query("page")
     .optional({ values: "falsy" })
     .isInt({ min: 1 })
