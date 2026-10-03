@@ -15,6 +15,11 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const UPLOADS_DIR = path.join(__dirname, "..", "..", "uploads");
 
 const IMAGE_MIME_TYPES = new Set(["image/jpeg", "image/png", "image/webp"]);
+const MIME_EXTENSIONS = {
+  "image/jpeg": ".jpg",
+  "image/png": ".png",
+  "image/webp": ".webp",
+};
 const MAX_IMAGE_SIZE = 5 * 1024 * 1024; // 5MB per file
 const MAX_IMAGES_PER_UPLOAD = 5;
 
@@ -32,7 +37,10 @@ function localStorage() {
   return multer.diskStorage({
     destination: (req, file, cb) => cb(null, UPLOADS_DIR),
     filename: (req, file, cb) => {
-      const ext = path.extname(file.originalname).toLowerCase() || ".bin";
+      // Extension comes from the validated MIME type, never from the
+      // client-supplied name: a `.html` name with an image MIME type would
+      // otherwise be stored and later served as HTML from this origin.
+      const ext = MIME_EXTENSIONS[file.mimetype] ?? ".bin";
       cb(null, `listing-${Date.now()}-${Math.round(Math.random() * 1e9)}${ext}`);
     },
   });

@@ -6,14 +6,15 @@ import config from "./config/index.js";
 import { storageMode, UPLOADS_DIR } from "./config/storage.js";
 import routes from "./routes/index.js";
 import errorHandler from "./middleware/errorHandler.js";
+import { apiLimiter, authLimiter } from "./middleware/rateLimit.js";
 
 const app = express();
 
 app.use(helmet());
 app.use(cors({ origin: config.clientUrl, credentials: true }));
 app.use(morgan("dev"));
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json({ limit: "100kb" }));
+app.use(express.urlencoded({ extended: true, limit: "100kb" }));
 
 // Serving local uploads at the same origin keeps the images reachable through
 // the Vite proxy in development. Cloudinary serves its own URLs instead.
@@ -26,6 +27,10 @@ if (storageMode === "local") {
   );
 }
 
+// Credential endpoints get the strict limiter; everything else gets the broad
+// one. Both run before the router so rejected requests never reach handlers.
+app.use("/api/auth", authLimiter);
+app.use("/api", apiLimiter);
 app.use("/api", routes);
 
 app.use(errorHandler);
