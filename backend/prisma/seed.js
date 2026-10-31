@@ -12,6 +12,18 @@ const prisma = new PrismaClient();
 
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL ?? 'admin@campus.local';
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD ?? 'admin1234';
+const WEAK_DEFAULT_PASSWORD = ADMIN_PASSWORD === 'admin1234';
+
+// The default admin password is for local development only. Running the seed
+// in production with it (or without ADMIN_PASSWORD at all) would create a
+// known-credential admin account, so the seed refuses to start (docs/02 §12
+// "Secret management", docs/06 D6).
+if (process.env.NODE_ENV === 'production' && WEAK_DEFAULT_PASSWORD) {
+  console.error(
+    'Refusing to seed: ADMIN_PASSWORD must be set to a unique value when NODE_ENV=production.',
+  );
+  process.exit(1);
+}
 
 const DEMO_USERS = [
   {
